@@ -16,7 +16,13 @@
     </style>
 </head>
 <body>
-
+    
+    <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <h2>🔒 Masukkan Sandi</h2>
+        <input type="password" id="pin-input" style="padding:10px; margin-bottom:10px; width:200px; text-align:center;">
+        <button onclick="cekLogin()" style="width:220px; background:black;">Buka Akses</button>
+    </div>
+    
     <h2>Input Keuangan</h2>
     
     <form id="form-keuangan">
@@ -66,6 +72,24 @@
         const form = document.getElementById('form-keuangan');
         const tombolSimpan = document.getElementById('tombol-simpan');
         const divPesan = document.getElementById('pesan');
+
+        function cekLogin() {
+            const pin = document.getElementById('pin-input').value;
+            const pinBenar = "uangevan"; // Ganti dengan PIN pilihanmu
+        
+            if (pin === pinBenar) {
+                document.getElementById('login-overlay').style.display = 'none';
+                // Opsional: Simpan status login agar tidak minta PIN terus saat refresh (sampai browser ditutup)
+                sessionStorage.setItem('isLoggedIn', 'true');
+            } else {
+                alert("PIN Salah!");
+            }
+        }
+        
+        // Cek apakah sebelumnya sudah login di sesi ini
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
 
         // --- FITUR AUTO TANGGAL ---
         // 1. Ambil elemen input tanggal berdasarkan ID-nya
@@ -124,4 +148,5 @@
         });
     </script>
 </body>
+
 </html>
