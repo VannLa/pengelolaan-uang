@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Database Keuangan</title>
+    <style>
+        /* Sedikit CSS agar form tidak terlalu berantakan */
+        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background: #28a745; color: white; border: none; cursor: pointer; width: 100%; font-weight: bold;}
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+        #pesan { margin-top: 15px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h2>Input Keuangan</h2>
+    
+    <form id="form-keuangan">
+        <div class="form-group">
+            <label for="tanggal">Tanggal</label>
+            <input type="date" id="tanggal" required>
+        </div>
+
+        <div class="form-group">
+            <label for="jenis">Jenis Transaksi</label>
+            <select id="jenis" required>
+                <option value="" disabled selected>Pilih salah satu...</option>
+                <option value="Pemasukan">Pemasukan</option>
+                <option value="Pengeluaran">Pengeluaran</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="jumlah">Jumlah (Rp)</label>
+            <input type="number" id="jumlah" placeholder="Contoh: 50000" required>
+        </div>
+
+        <div class="form-group">
+            <label for="metode">Metode Pembayaran</label>
+            <select id="metode" required>
+                <option value="" disabled selected>Pilih salah satu...</option>
+                <option value="Tunai">Tunai</option>
+                <option value="Bank BCA">Bank BCA</option>
+                <option value="Bank BNI">Bank BNI</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="keterangan">Keterangan Transaksi</label>
+            <input type="text" name="keterangan" id="keterangan" autocomplete="off" required>
+        </div>
+
+        <button type="submit" id="tombol-simpan">Simpan Data</button>
+    </form>
+
+    <div id="pesan"></div>
+
+    <script>
+        // MASUKKAN LINK GOOGLE SCRIPT KAMU DI BAWAH INI
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx8Dy9sM4lLP-WywIfPX9gMxoF2m9vFD6vwlicR5XDm6WmXH4-QpxjXlSkfayOfXj10QQ/exec'; 
+        
+        const form = document.getElementById('form-keuangan');
+        const tombolSimpan = document.getElementById('tombol-simpan');
+        const divPesan = document.getElementById('pesan');
+
+        // --- FITUR AUTO TANGGAL ---
+        // 1. Ambil elemen input tanggal berdasarkan ID-nya
+        const inputTanggal = document.getElementById('tanggal');
+        // 2. Dapatkan waktu hari ini
+        const today = new Date();
+        // 3. Kita perlu format YYYY-MM-DD (Standar HTML)
+        // padStart(2, '0') gunanya agar angka 1-9 menjadi 01-09
+        const tahun = today.getFullYear();
+        const bulan = String(today.getMonth() + 1).padStart(2, '0'); 
+        const hari = String(today.getDate()).padStart(2, '0');
+        // 4. Masukkan ke kolom input
+        inputTanggal.value = `${tahun}-${bulan}-${hari}`;
+        // --- AKHIR FITUR AUTO TANGGAL ---
+
+        form.addEventListener('submit', e => {
+            e.preventDefault(); // Mencegah web reload saat tombol diklik
+            
+            // Mengubah tampilan tombol saat loading
+            tombolSimpan.disabled = true;
+            tombolSimpan.textContent = 'Menyimpan...';
+            divPesan.textContent = '';
+
+            // Mengambil data dari form HTML
+            const dataKeuangan = {
+                tanggal: document.getElementById('tanggal').value,
+                jenis: document.getElementById('jenis').value,
+                jumlah: document.getElementById('jumlah').value,
+                metode: document.getElementById('metode').value,
+                keterangan: document.getElementById('keterangan').value
+            };
+
+            // Mengirim data ke Google Sheets menggunakan Fetch API (Metode POST)
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(dataKeuangan)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Jika berhasil
+                divPesan.textContent = 'Yeay! Data berhasil masuk ke Spreadsheet!';
+                divPesan.style.color = 'green';
+                form.reset(); // Mengosongkan form
+            })
+            .catch(error => {
+                // Jika gagal
+                divPesan.textContent = 'Gagal menyimpan data. Cek koneksi atau URL.';
+                divPesan.style.color = 'red';
+                console.error('Error!', error.message);
+            })
+            .finally(() => {
+                // Mengembalikan tombol ke semula
+                tombolSimpan.disabled = false;
+                tombolSimpan.textContent = 'Simpan Data';
+            });
+        });
+    </script>
+</body>
+</html>
