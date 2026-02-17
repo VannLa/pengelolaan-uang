@@ -3,150 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Database Keuangan</title>
-    <style>
-        /* Sedikit CSS agar form tidak terlalu berantakan */
-        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { padding: 10px 15px; background: #28a745; color: white; border: none; cursor: pointer; width: 100%; font-weight: bold;}
-        button:disabled { background: #cccccc; cursor: not-allowed; }
-        #pesan { margin-top: 15px; font-weight: bold; text-align: center; }
-    </style>
+    <title>Database Keuangan Evan</title>
 </head>
+<style>
+body { 
+    font-family: sans-serif; 
+    padding: 20px; 
+    max-width: 400px; 
+    margin: auto; 
+    background-color: #CBDDE9; 
+    color: #2872A1;
+}
+
+.form-group { margin-bottom: 15px; }
+
+label { 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    color: #2872A1;
+}
+
+input, select { 
+    width: 100%; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    background-color: #f0f8ff; 
+    border: 2px solid #2872A1;
+    border-radius: 5px;
+    color: #2872A1;
+    font-size: 14px;
+}
+
+/* Style khusus untuk Switcher */
+.switcher-box {
+    background: #2872A1;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: white;
+    text-align: center;
+}
+.switcher-box select {
+    margin-top: 5px;
+    background: white;
+    font-weight: bold;
+}
+
+button { 
+    padding: 12px 15px; 
+    background: #2872A1; 
+    color: #CBDDE9; 
+    border: none; 
+    cursor: pointer; 
+    width: 100%; 
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button:disabled { 
+    background: #cccccc; 
+    cursor: not-allowed; 
+}
+
+#pesan { 
+    margin-top: 15px; 
+    font-weight: bold; 
+    text-align: center; 
+}
+
+/* Helper untuk menyembunyikan form */
+.hidden { display: none; }
+</style>
 <body>
     
     <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <h2>🔒 Masukkan Sandi</h2>
+        <h2 style="color:#2872A1;">🔒 Masukkan Sandi</h2>
         <input type="password" id="pin-input" style="padding:10px; margin-bottom:10px; width:200px; text-align:center;">
-        <button onclick="cekLogin()" style="width:220px; background:black;">Buka Akses</button>
+        <button onclick="cekLogin()" style="width:200px;">Buka Akses</button>
     </div>
     
-    <h2>Input Keuangan</h2>
+    <h2 style="text-align: center;">Input Data Keuangan</h2>
     
-    <form id="form-keuangan">
-        <div class="form-group">
-            <label for="tanggal">Tanggal</label>
-            <input type="date" id="tanggal" required>
-        </div>
-
-        <div class="form-group">
-            <label for="jenis">Jenis Transaksi</label>
-            <select id="jenis" required>
-                <option value="" disabled selected>Pilih salah satu...</option>
-                <option value="Pemasukan">Pemasukan</option>
-                <option value="Pengeluaran">Pengeluaran</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="jumlah">Jumlah (Rp)</label>
-            <input type="number" id="jumlah" placeholder="Contoh: 50000" required>
-        </div>
-
-        <div class="form-group">
-            <label for="metode">Metode Pembayaran</label>
-            <select id="metode" required>
-                <option value="" disabled selected>Pilih salah satu...</option>
-                <option value="Tunai">Tunai</option>
-                <option value="Bank BCA">Bank BCA</option>
-                <option value="Bank BNI">Bank BNI</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="keterangan">Keterangan Transaksi</label>
-            <input type="text" name="keterangan" id="keterangan" autocomplete="off" required>
-        </div>
-
-        <button type="submit" id="tombol-simpan">Simpan Data</button>
-    </form>
-
+    <div class="switcher-box">
+        <label style="color:white;">Mau isi laporan apa?</label>
+        <select id="pilih-laporan" onchange="gantiForm()">
+            <option value="uang">💰 Laporan Keuangan Harian</option>
+            <option value="perpuluhan">⛪ Laporan Perpuluhan</option>
+        </select>
+    </div>
+    
     <div id="pesan"></div>
 
+    <div id="container-uang">
+        <form id="form-uang" autocomplete="off">
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="tgl_uang" required>
+            </div>
+
+            <div class="form-group">
+                <label>Jenis Transaksi</label>
+                <select id="jenis_uang" required>
+                    <option value="" disabled selected>Pilih...</option>
+                    <option value="pemasukan">Pemasukan</option>
+                    <option value="pengeluaran">Pengeluaran</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Metode Pembayaran</label>
+                <select id="metode_uang" required>
+                    <option value="" disabled selected>Pilih...</option>
+                    <option value="tunai">Tunai</option>
+                    <option value="transfer bca">Bank BCA</option>
+                    <option value="transfer bni">Bank BNI</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Jumlah (Rp)</label>
+                <input type="number" id="jumlah_uang" placeholder="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Keterangan</label>
+                <input type="text" id="ket_uang" required>
+            </div>
+
+            <button type="submit" id="btn-uang">Simpan Keuangan</button>
+        </form>
+    </div>
+
+    <div id="container-perpuluhan" class="hidden">
+        <form id="form-perpuluhan" autocomplete="off">
+            <div class="form-group">
+                <label>Tanggal</label>
+                <input type="date" id="tgl_puluhan" required>
+            </div>
+
+            <div class="form-group">
+                <label>Keterangan Barang/Jasa</label>
+                <input type="text" id="ket_puluhan" placeholder="Misal: Karet Bracket" required>
+            </div>
+
+            <div class="form-group">
+                <label>Modal (Rp)</label>
+                <input type="number" id="modal_puluhan" placeholder="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Dapat / Omset (Rp)</label>
+                <input type="number" id="dapat_puluhan" placeholder="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select id="status_puluhan" required>
+                    <option value="Belum">Belum Disetor</option>
+                    <option value="Sudah">Sudah Disetor</option>
+                </select>
+            </div>
+
+            <button type="submit" id="btn-puluhan">Simpan Perpuluhan</button>
+        </form>
+    </div>
+
     <script>
-        // MASUKKAN LINK GOOGLE SCRIPT KAMU DI BAWAH INI
+        // --- 1. CONFIGURATION ---
+        // Ganti dengan URL Google Script kamu yang baru (yang sudah support 2 tab)
         const scriptURL = 'https://script.google.com/macros/s/AKfycbx8Dy9sM4lLP-WywIfPX9gMxoF2m9vFD6vwlicR5XDm6WmXH4-QpxjXlSkfayOfXj10QQ/exec'; 
-        
-        const form = document.getElementById('form-keuangan');
-        const tombolSimpan = document.getElementById('tombol-simpan');
         const divPesan = document.getElementById('pesan');
 
+        // --- 2. LOGIN SYSTEM ---
         function cekLogin() {
             const pin = document.getElementById('pin-input').value;
-            const pinBenar = "uangevan"; // Ganti dengan PIN pilihanmu
-        
+            const pinBenar = "uangevan"; 
             if (pin === pinBenar) {
                 document.getElementById('login-overlay').style.display = 'none';
-                // Opsional: Simpan status login agar tidak minta PIN terus saat refresh (sampai browser ditutup)
                 sessionStorage.setItem('isLoggedIn', 'true');
             } else {
-                alert("PIN Salah!");
+                alert("Sandi Salah!");
             }
         }
         
-        // Cek apakah sebelumnya sudah login di sesi ini
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             document.getElementById('login-overlay').style.display = 'none';
         }
 
-        // --- FITUR AUTO TANGGAL ---
-        // 1. Ambil elemen input tanggal berdasarkan ID-nya
-        const inputTanggal = document.getElementById('tanggal');
-        // 2. Dapatkan waktu hari ini
-        const today = new Date();
-        // 3. Kita perlu format YYYY-MM-DD (Standar HTML)
-        // padStart(2, '0') gunanya agar angka 1-9 menjadi 01-09
-        const tahun = today.getFullYear();
-        const bulan = String(today.getMonth() + 1).padStart(2, '0'); 
-        const hari = String(today.getDate()).padStart(2, '0');
-        // 4. Masukkan ke kolom input
-        inputTanggal.value = `${tahun}-${bulan}-${hari}`;
-        // --- AKHIR FITUR AUTO TANGGAL ---
+        document.getElementById('pin-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') cekLogin();
+        });
 
-        form.addEventListener('submit', e => {
-            e.preventDefault(); // Mencegah web reload saat tombol diklik
+        // --- 3. AUTO DATE SYSTEM ---
+        function setTodayDate() {
+            const today = new Date();
+            const tahun = today.getFullYear();
+            const bulan = String(today.getMonth() + 1).padStart(2, '0'); 
+            const hari = String(today.getDate()).padStart(2, '0');
+            const formatTgl = `${tahun}-${bulan}-${hari}`;
             
-            // Mengubah tampilan tombol saat loading
-            tombolSimpan.disabled = true;
-            tombolSimpan.textContent = 'Menyimpan...';
+            document.getElementById('tgl_uang').value = formatTgl;
+            document.getElementById('tgl_puluhan').value = formatTgl;
+        }
+        setTodayDate();
+
+        // --- 4. SWITCHER FORM SYSTEM ---
+        function gantiForm() {
+            const pilihan = document.getElementById('pilih-laporan').value;
+            const formUang = document.getElementById('container-uang');
+            const formPuluhan = document.getElementById('container-perpuluhan');
+            
+            divPesan.textContent = ''; // Reset pesan
+
+            if (pilihan === 'uang') {
+                formUang.classList.remove('hidden');
+                formPuluhan.classList.add('hidden');
+            } else {
+                formUang.classList.add('hidden');
+                formPuluhan.classList.remove('hidden');
+            }
+        }
+
+        // --- 5. SUBMIT HANDLER: LAPORAN KEUANGAN ---
+        const formUang = document.getElementById('form-uang');
+        formUang.addEventListener('submit', e => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-uang');
+            kirimData(btn, {
+                target: 'laporanuang', // KUNCI: Beri tahu script ini untuk sheet 'laporanuang'
+                tanggal: document.getElementById('tgl_uang').value,
+                jenis: document.getElementById('jenis_uang').value,
+                metode: document.getElementById('metode_uang').value,
+                jumlah: document.getElementById('jumlah_uang').value,
+                keterangan: document.getElementById('ket_uang').value
+            }, formUang);
+        });
+
+        // --- 6. SUBMIT HANDLER: PERPULUHAN ---
+        const formPuluhan = document.getElementById('form-perpuluhan');
+        formPuluhan.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            // HITUNG OTOMATIS
+            const modal = parseInt(document.getElementById('modal_puluhan').value) || 0;
+            const dapat = parseInt(document.getElementById('dapat_puluhan').value) || 0;
+            const pendapatan = dapat - modal; // Profit
+            const perpuluhan = pendapatan * 0.1; // 10%
+
+            const btn = document.getElementById('btn-puluhan');
+            
+            kirimData(btn, {
+                target: 'perpuluhan', // KUNCI: Beri tahu script ini untuk sheet 'perpuluhan'
+                tanggal: document.getElementById('tgl_puluhan').value,
+                keterangan: document.getElementById('ket_puluhan').value,
+                modal: modal,
+                dapat: dapat,
+                pendapatan: pendapatan, // Hasil hitungan otomatis dikirim
+                perpuluhan: perpuluhan, // Hasil hitungan otomatis dikirim
+                status: document.getElementById('status_puluhan').value
+            }, formPuluhan);
+        });
+
+        // --- 7. FUNGSI KIRIM DATA (Global) ---
+        function kirimData(tombol, dataObjek, formElemen) {
+            tombol.disabled = true;
+            tombol.textContent = 'Menyimpan...';
             divPesan.textContent = '';
 
-            // Mengambil data dari form HTML
-            const dataKeuangan = {
-                tanggal: document.getElementById('tanggal').value,
-                jenis: document.getElementById('jenis').value,
-                jumlah: document.getElementById('jumlah').value,
-                metode: document.getElementById('metode').value,
-                keterangan: document.getElementById('keterangan').value
-            };
-
-            // Mengirim data ke Google Sheets menggunakan Fetch API (Metode POST)
             fetch(scriptURL, {
                 method: 'POST',
-                body: JSON.stringify(dataKeuangan)
+                body: JSON.stringify(dataObjek)
             })
             .then(response => response.json())
             .then(data => {
-                // Jika berhasil
-                divPesan.textContent = 'Yeay! Data berhasil masuk ke Spreadsheet!';
-                divPesan.style.color = 'green';
-                form.reset(); // Mengosongkan form
+                if(data.status === 'success') {
+                    divPesan.textContent = '✅ Berhasil: ' + data.message;
+                    divPesan.style.color = 'green';
+                    formElemen.reset();
+                    setTodayDate(); // Reset tanggal ke hari ini lagi
+                } else {
+                    throw new Error(data.message);
+                }
             })
             .catch(error => {
-                // Jika gagal
-                divPesan.textContent = 'Gagal menyimpan data. Cek koneksi atau URL.';
+                divPesan.textContent = '❌ Gagal: ' + error.message;
                 divPesan.style.color = 'red';
-                console.error('Error!', error.message);
             })
             .finally(() => {
-                // Mengembalikan tombol ke semula
-                tombolSimpan.disabled = false;
-                tombolSimpan.textContent = 'Simpan Data';
+                tombol.disabled = false;
+                tombol.textContent = 'Simpan Data';
             });
-        });
+        }
     </script>
 </body>
-
 </html>
